@@ -3,6 +3,7 @@ package job
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -13,5 +14,5 @@ func (m *JobManager) listenHTTP() {
 		w.Write(data)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	})
-	http.ListenAndServe(fmt.Sprintf(":%d", m.httpPort), nil)
+	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%d", m.httpPort), nil))
 }
