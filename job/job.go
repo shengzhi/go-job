@@ -59,6 +59,7 @@ func (jw *jobWrapper) Next() time.Time {
 }
 
 func (jw *jobWrapper) Run() {
+	fmt.Println(jw.job.Name(), " running")
 	if !jw.allowConcurrent && jw.status == Running {
 		fmt.Println("not allow concurrent")
 		return
