@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/robfig/cron"
+	"github.com/shengzhi/util/snowflake"
 )
 
 // IJob job接口
@@ -58,10 +59,13 @@ func (jw *jobWrapper) Next() time.Time {
 	return jw.schedule.Next(time.Now())
 }
 
+var jobIDGen, _ = snowflake.NewIdWorker(int64(os.Getpid()))
+
 func (jw *jobWrapper) Run() {
-	fmt.Println(jw.job.Name(), " running")
+	instanceid, _ := jobIDGen.NextId()
+	log.Printf("%s - %d begin run \r\n", jw.job.Name(), instanceid)
 	if !jw.allowConcurrent && jw.status == Running {
-		fmt.Println("not allow concurrent")
+		log.Println("not allow concurrent")
 		return
 	}
 	start := time.Now()
@@ -70,6 +74,7 @@ func (jw *jobWrapper) Run() {
 	err := jw.job.Run()
 	end := time.Now()
 	his := RunHistory{
+		ID:        instanceid,
 		StartTime: start, CompletedTime: end,
 		Elased: int64(end.Sub(start).Seconds()),
 	}
@@ -81,6 +86,7 @@ func (jw *jobWrapper) Run() {
 	}
 	jw.runHis.add(his)
 	jw.prevExecTime = start
+	log.Printf("%s - %d end run \r\n", jw.job.Name(), instanceid)
 }
 
 type OptionFunc func(jm *JobManager)

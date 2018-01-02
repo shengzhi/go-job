@@ -8,6 +8,7 @@ import (
 )
 
 type RunHistory struct {
+	ID                       int64
 	StartTime, CompletedTime time.Time
 	Elased                   int64
 	Result                   string
